@@ -1,0 +1,90 @@
+package bankingApp;
+import java.util.ArrayList;
+
+public class Bank {
+	
+       private ArrayList<UserAccount> accounts = new ArrayList<UserAccount>();
+	   private ArrayList<Integer> accountsNumbers = new ArrayList<Integer>();
+	   
+	   public int withdraw(int accountNumber,double ammount) {
+		   int index = accountsNumbers.indexOf(accountNumber);
+		   double balance = accounts.get(index).getBalance();
+		   if(accounts.get(index).getBalance() > 0 && accounts.get(index).getBalance() >= ammount)
+		   {
+			   accounts.get(index).setBalance(balance -= ammount);
+			   return 1;
+		   }
+		   else
+		   {
+			   System.out.println("You can withdraw max " + balance + " " + accounts.get(index).getCurrency());
+			   return 0;
+		   }
+	   }
+	   
+
+	   
+	   public UserAccount getAccount(int accountNumber) {
+		   if(!accountsNumbers.contains(accountNumber))
+		   {
+			   System.out.println("Account doesn't exist");
+			   System.out.println();
+			   return null;
+		   }
+		   return accounts.get(accountsNumbers.indexOf(accountNumber));
+	   }
+	   
+
+	   
+	   public void fillingAccount(int accountNumber,double ammount) {
+		   int index;
+		   index = accountsNumbers.indexOf(accountNumber);
+		   accounts.get(index).setBalance(accounts.get(index).getBalance() + ammount);
+	   }
+	   
+
+	   
+	   public int deletingAccount(int accountNumber,int deletingNumber) {
+		   int index = accountsNumbers.indexOf(accountNumber);
+		   String name = accounts.get(index).getUserName();
+		   if(deletingNumber == accounts.get(index).getDeletingCode())
+		   {
+			   accounts.remove(index);
+			   accountsNumbers.remove(index);
+			   System.out.println("Account with number " + accountNumber + " of owner's name " +
+			                      name + " was removed");
+			   return 1;
+		   }
+		   else
+		   {
+			   System.out.println("The removing code is incorrect.Write again:");
+			   return 0;
+		   }
+	   }
+	  
+
+	   
+       public int createAccount(UserAccount userAcc,int accountNumber) {
+		   if(!accountsNumbers.contains(accountNumber))
+		   {
+			   accounts.add(userAcc);
+			   userAcc.setAccountNumber(accountNumber);
+			   accountsNumbers.add(accountNumber);
+			   int index = accountsNumbers.indexOf(accountNumber);
+			   System.out.println("Account with number " + accountsNumbers.get(index) + " was succesfully created");
+			   System.out.println();
+			   return 1;
+		   }
+		   return 0;
+       }
+       
+
+       
+       public ArrayList<UserAccount> getAccountsList() {
+    	   return accounts;
+       }
+       
+       public ArrayList<Integer> getAccountsNumbers(){
+    	   return accountsNumbers;
+       }
+    
+}
