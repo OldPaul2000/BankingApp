@@ -1,4 +1,4 @@
-# BankingApp
+# BankingApp(Java)
 
 This application simulates a bank.
 You can create or remove a banking account.To create an account the app will tell you to introduce the user's data and then the data for the new account:like name,birth date,nationality etc for the user and currency and ammount of money for the account.If you want to remove the account you must introduce a 4 digit deletion code that you added to the account when you have created it.
