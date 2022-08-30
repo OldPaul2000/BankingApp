@@ -1,0 +1,351 @@
+package bankingApp;
+
+import java.util.Random;
+import java.util.Scanner;
+
+public class Main {
+    private static Scanner scan = new Scanner(System.in);
+    private static Random random = new Random();
+	public static void main(String[] args) {
+		
+		Bank ING = new Bank();
+		
+		displayOptions();
+		String command = scan.nextLine();
+	    while(command.length() > 1 || !Character.isDigit(command.charAt(0)))
+	    {
+	    	System.out.print("Incorrect command.Just single digits accepted.Write again:");
+	    	command = scan.nextLine();
+	    }
+	    int commandNumber = Integer.parseInt(command);
+		while(commandNumber > 0 && commandNumber < 9)
+		{
+			if(commandNumber == 8)
+			{
+				displayOptions();
+			}
+			else if(commandNumber == 1)
+			{
+				createAccount(ING);
+			}
+			else if(commandNumber == 2)
+			{
+				if(ING.getAccountsList().size() > 0)
+				{
+					removeAccount(ING);
+				}
+				else
+				{
+					System.out.println("No account exists");
+				}
+			}
+			else if(commandNumber == 3)
+			{
+				if(ING.getAccountsList().size() > 0)
+				{
+					displayAccountAndUserInfo(ING);;
+				}
+				else
+				{
+					System.out.println("No account exists");
+				}
+			}
+			else if(commandNumber == 4)
+			{
+				if(ING.getAccountsList().size() > 0)
+				{
+					displayAccountsList(ING);;
+				}
+				else
+				{
+					System.out.println("No account exists");
+				}
+			}
+			else if(commandNumber == 5)
+			{
+				if(ING.getAccountsList().size() > 0)
+				{
+					fillingAccount(ING);
+				}
+				else
+				{
+					System.out.println("No account exists");
+				}
+			}
+			else if(commandNumber == 6)
+			{
+				if(ING.getAccountsList().size() > 1)
+				{
+					transferMoney(ING);
+				}
+				else
+				{
+					System.out.println("At least two accounts must exist");
+				}
+				
+			}
+			else if(commandNumber == 7)
+			{
+				if(ING.getAccountsList().size() > 0)
+				{
+					transactionsHistory(ING);
+				}
+				else
+				{
+					System.out.println("No account exists");
+				}
+			}
+			command = scan.nextLine();
+		    while(command.length() > 1 || !Character.isDigit(command.charAt(0)))
+		    {
+		    	System.out.print("Incorrect command.Just single digits accepted.Write again:");
+		    	command = scan.nextLine();
+		    }
+		    commandNumber = Integer.parseInt(command);
+		}
+		
+		
+		
+		
+	}
+	
+	private static void transactionsHistory(Bank bank) {
+		System.out.print("Write the account number you want to view transactions history of:");
+		int accountNumber = scan.nextInt();
+		while(!bank.getAccountsNumbers().contains(accountNumber))
+		{
+			System.out.print("This account doesn't exist.Write another:");
+			accountNumber = scan.nextInt();
+		}
+		scan.nextLine();
+		int size = bank.getAccount(accountNumber).getTransactionsHistory().size();
+		if(size == 0)
+		{
+			System.out.println("No transactions found");
+		}
+		else
+		{
+			for(int i = 0; i < size; i++)
+		    {
+			    System.out.println(bank.getAccount(accountNumber).getTransactionsHistory().get(i));
+		    }
+		}
+	}
+	
+	private static void transferMoney(Bank bank) {
+		System.out.print("Write the account number of the account you want to transfer from:");
+		int accountNumber1 = scan.nextInt();
+		while(!bank.getAccountsNumbers().contains(accountNumber1))
+		{
+			System.out.print("This account number doesn't exist.Write it again:");
+			accountNumber1 = scan.nextInt();
+		}
+		System.out.print("Write the account number of the account you want to transfer to:");
+		int accountNumber2 = scan.nextInt();
+		while(accountNumber1 == accountNumber2)
+		{
+			System.out.println("The accounts numbers must be different");
+			System.out.print("Write the account number of the account you want to transfer to:");
+			accountNumber2 = scan.nextInt();
+		}
+		while(!bank.getAccountsNumbers().contains(accountNumber2))
+		{
+			System.out.print("This account number doesn't exist.Write it again:");
+			accountNumber2 = scan.nextInt();
+		}
+		System.out.print("Write the ammount of money to transfer:");
+		double ammount = scan.nextDouble();
+		int wasWithdrawn = bank.withdraw(accountNumber1, ammount);
+		while(wasWithdrawn == 0)
+		{
+			System.out.print("Write another ammount:");
+			ammount = scan.nextDouble();
+			wasWithdrawn = bank.withdraw(accountNumber1, ammount);
+		}
+		double sum = 0;
+		if(bank.getAccount(accountNumber1).getCurrency().equals("EUR") && 
+	       bank.getAccount(accountNumber2).getCurrency().equals("RON"))
+		{
+			sum = ammount * 4.87;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		else if(bank.getAccount(accountNumber1).getCurrency().equals("RON") && 
+	            bank.getAccount(accountNumber2).getCurrency().equals("EUR"))
+		{
+			sum = ammount / 4.87;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		else if(bank.getAccount(accountNumber1).getCurrency().equals("EUR") && 
+	            bank.getAccount(accountNumber2).getCurrency().equals("USD"))
+		{
+			sum = ammount * 1;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		else if(bank.getAccount(accountNumber1).getCurrency().equals("USD") && 
+	            bank.getAccount(accountNumber2).getCurrency().equals("EUR"))
+		{
+			sum = ammount / 1;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		else if(bank.getAccount(accountNumber1).getCurrency().equals("RON") && 
+	            bank.getAccount(accountNumber2).getCurrency().equals("USD"))
+		{
+			sum = ammount / 4.86;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		else if(bank.getAccount(accountNumber1).getCurrency().equals("USD") && 
+	            bank.getAccount(accountNumber2).getCurrency().equals("RON"))
+		{
+			sum = ammount * 4.86;
+			bank.fillingAccount(accountNumber2, sum);
+		}
+		String transactionAcc1 = accountNumber1 + " transfered " + ammount + 
+                                 bank.getAccount(accountNumber1).getCurrency() + " to " +
+                                 accountNumber2;
+		String transactionAcc2 = accountNumber2 + " received " + sum + 
+				                 bank.getAccount(accountNumber2).getCurrency() + " from " +
+				                 accountNumber1;
+		
+		bank.getAccount(accountNumber1).getTransactionsHistory().add(transactionAcc1);
+		bank.getAccount(accountNumber2).getTransactionsHistory().add(transactionAcc2);
+		System.out.println(ammount + bank.getAccount(accountNumber1).getCurrency() + 
+                           " from account with number " + accountNumber1 + " was transferred to " +
+                           accountNumber2);
+		scan.nextLine();
+	}
+	
+	private static void displayAccountAndUserInfo(Bank bank) {
+		System.out.print("Write the account number to get info about:");
+		int accountNumber = scan.nextInt();
+		while(!bank.getAccountsNumbers().contains(accountNumber))
+		{
+			System.out.print("This account doesn't exist.Write again:");
+			accountNumber = scan.nextInt();
+		}
+		System.out.println("ACCOUNT INFO:");
+		System.out.println(bank.getAccount(accountNumber).toString());
+	    System.out.println("USER INFO:");
+	    System.out.println(bank.getAccount(accountNumber).getUser().toString());
+	    System.out.println();
+	    scan.nextLine();
+	}
+	
+	private static void displayAccountsList(Bank bank) {
+		int arrayLength = bank.getAccountsList().size();
+		for(int i = 0; i < arrayLength; i++)
+		{
+			System.out.print(bank.getAccountsNumbers().get(i) + "-");
+			System.out.print(bank.getAccountsList().get(i).getUserName());
+			System.out.println();
+		}
+	}
+	
+	private static void fillingAccount(Bank bank) {
+		System.out.print("Write the account number to fill with money:");
+		int accountNumber = scan.nextInt();
+		while(!bank.getAccountsNumbers().contains(accountNumber))
+		{
+			System.out.print("This account number doesn't exist.Write it again:");
+			accountNumber = scan.nextInt();
+		}
+		System.out.print("Write the ammount of money:");
+		double ammount = scan.nextDouble();
+		bank.fillingAccount(accountNumber, ammount);
+		System.out.println("Account with number " + accountNumber + " was filled with " +
+	               ammount + bank.getAccount(accountNumber).getCurrency());
+		scan.nextLine();
+	}
+	
+	private static void removeAccount(Bank bank) {
+		System.out.print("Input the account number to remove the account:");
+		int accountNumber = scan.nextInt();
+		int removingCode = 1;
+		int wasDeleted = 0;
+		if(bank.getAccountsNumbers().contains(accountNumber))
+		{
+			System.out.print("If you are sure enter the removing code else enter 0:");
+			removingCode = scan.nextInt();
+			if(removingCode != 0)
+			{
+				wasDeleted = bank.deletingAccount(accountNumber, removingCode);
+				while(wasDeleted != 1)
+				{
+					removingCode = scan.nextInt();
+					wasDeleted = bank.deletingAccount(accountNumber, removingCode);
+				}
+			}
+			else
+			{
+				System.out.println("The account hasn't been removed");
+			}
+		}
+		else
+		{
+			System.out.println("This bank account doesn't exist");
+		}
+		scan.nextLine();
+	}
+	
+	private static void createAccount(Bank bank) {
+		System.out.println("First you need to introduce your personal data");
+		System.out.print("Write first name:");
+		String first = scan.nextLine();
+		System.out.print("Write last name:");
+		String last = scan.nextLine();
+		System.out.print("Write birth date:");
+		String birthDate = scan.nextLine();
+		System.out.print("Write nationality:");
+		String nationality = scan.nextLine();
+		System.out.print("Write phone number:");
+		String phoneNumber = scan.nextLine();
+		System.out.print("Write email address:");
+		String email = scan.nextLine();
+		System.out.println();
+		
+		User user = new User(first,last,birthDate,nationality,phoneNumber,email);
+		
+		System.out.println("Now you need to introduce data for your new account");
+		System.out.print("Write the code for removing the account:");
+		int code = scan.nextInt();
+		while(code < 1000 || code > 9999)
+		{
+			System.out.println("The code must be formed of 4 digits");
+			code = scan.nextInt();
+		}
+		scan.nextLine();
+		System.out.print("Write the currency for your account");
+		System.out.print("(Currencies accepted(non case-sensitive):EUR,USD,RON):");
+		String currency = scan.nextLine().toUpperCase();
+		while(!currency.equals("EUR") && !currency.equals("USD") && !currency.equals("RON"))
+		{
+			System.out.println("Currencies accepted(non case-sensitive):EUR,USD,RON");
+			System.out.print("Write again:");
+			currency = scan.nextLine().toUpperCase();
+		}
+		System.out.print("Input a sum to be added to your account:");
+		double sum = scan.nextDouble();
+		
+		UserAccount u1 = new UserAccount(user,code,currency,sum);
+		int accountNumber = random.nextInt(89999999) + 10000000;
+		int wasCreated = bank.createAccount(u1, accountNumber);
+		while(wasCreated == 0)
+		{
+			accountNumber = random.nextInt(89999999) + 10000000;
+			wasCreated = bank.createAccount(u1, accountNumber);
+		}
+		scan.nextLine();
+	}
+	
+	private static void displayOptions() {
+		System.out.println("1 - Create an account");
+		System.out.println("2 - Remove an account");
+		System.out.println("3 - Display account and user info based on account number");
+		System.out.println("4 - Display list with accounts number and name");
+		System.out.println("5 - Fill an account with money");
+		System.out.println("6 - Transferring money");
+		System.out.println("7 - Transactions history");
+		System.out.println("8 - Display options");
+		System.out.println("Else for exit");
+	}
+
+}
